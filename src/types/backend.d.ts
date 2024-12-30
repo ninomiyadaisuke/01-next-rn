@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export { };
 // https://bobbyhadz.com/blog/typescript-make-types-global#declare-global-types-in-typescript
 
@@ -19,6 +20,14 @@ declare global {
         data?: T;
     }
 
+    interface ILogin {
+        user: {
+            _id: string;
+            name: string;
+            email: string;
+        },
+        access_token: string;
+    }
     interface IModelPaginate<T> {
         meta: {
             current: number;
@@ -27,6 +36,15 @@ declare global {
             total: number;
         },
         result: T[]
+    }
+
+        interface ILogin {
+        user: {
+            _id: string;
+            name: string;
+            email: string;
+        },
+        access_token: string;
     }
 
 }
