@@ -1,22 +1,27 @@
 "use client";
-import { Button, Col, Divider, Form, Input, Row } from "antd";
+import { Button, Col, Divider, Form, Input, notification, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { authenticate } from "@/utils/actions";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const router = useRouter();
   const onFinish = async (values: { email: string; password: string }) => {
     console.log("Success:", values);
     const { email, password } = values;
     const res = await authenticate(email, password);
-    console.log(res, "res");
-
-    // const data = await signIn("credentials", {
-    //   email,
-    //   password,
-    //   redirect: false,
-    // });
-    // console.log("Data:", data);
+    if (res?.error) {
+      notification.error({
+        message: "Error Login",
+        description: res?.error,
+      });
+      if (res.code === 2) {
+        router.push("/verify");
+      }
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (

@@ -4,6 +4,7 @@ import { InactiveAccountError, InvalidEmailPasswordError } from "./utils/errors"
 import { sendRequest } from "./utils/api";
 import { IUser } from "./types/next-auth";
 
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -22,7 +23,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
         })
 
-        if (!res.statusCode) {
+        if (+res.statusCode === 201) {
           return {
             _id: res?.data?.user._id,
             name: res?.data?.user.name,
@@ -54,5 +55,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       (session.user as IUser) = token.user
       return session
     },
+    authorized: async ({ auth }) => {
+      return !!auth
+    }
   },
 })
