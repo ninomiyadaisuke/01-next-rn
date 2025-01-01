@@ -4,21 +4,30 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { authenticate } from "@/utils/actions";
 import { useRouter } from "next/navigation";
+import ModalReactive from "./modal.reactive";
+import { useState } from "react";
 
 const Login = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+
+
   const router = useRouter();
   const onFinish = async (values: { email: string; password: string }) => {
-    console.log("Success:", values);
     const { email, password } = values;
+    setUserEmail("");
     const res = await authenticate(email, password);
     if (res?.error) {
+      if (res.code === 2) {
+        setIsModalOpen(true);
+        setUserEmail(email);
+        return;
+        // router.push("/verify");
+      }
       notification.error({
         message: "Error Login",
         description: res?.error,
       });
-      if (res.code === 2) {
-        router.push("/verify");
-      }
     } else {
       router.push("/dashboard");
     }
@@ -84,6 +93,12 @@ const Login = () => {
           </div>
         </fieldset>
       </Col>
+
+      <ModalReactive
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        userEmail={userEmail}
+      />
     </Row>
   );
 };
