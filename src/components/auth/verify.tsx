@@ -1,33 +1,37 @@
 "use client";
 import React from "react";
-import { Button, Col, Divider, Form, Input, notification, Row } from "antd";
+import { Button, Col, Divider, Form, Input, message, notification, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { sendRequest } from "@/utils/api";
 import { useRouter } from "next/navigation";
 
-const Register = () => {
+type Props = {
+  _id: string;
+};
+
+const Verify = ({ _id }: Props) => {
   const router = useRouter();
-  const onFinish = async (values: {
-    email: string;
-    password: string;
-    name: string;
-  }) => {
-    const { email, password, name } = values;
-    const res = await sendRequest<IBackendRes<{ _id: string }>>({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL!}/api/v1/auth/register`,
+  const onFinish = async (values: { _id: string; code: string }) => {
+    console.log("Success:", values);
+
+    const { _id, code } = values;
+
+    const res = await sendRequest<IBackendRes<{ _id: string; code: string }>>({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URL!}/api/v1/auth/check-code`,
       method: "POST",
       body: {
-        email,
-        password,
-        name,
+        _id,
+        code,
       },
     });
+
     if (res.data) {
-      router.push(`/verify/${res.data._id}`);
+      message.success("アカウントの有効化に成功しました。登録したメールアドレスとパスワードでログインしてください。");
+      router.push(`/auth/login`);
     } else {
       notification.error({
-        message: "Error Register",
+        message: "Verify Error",
         description: res.message,
       });
     }
@@ -51,33 +55,16 @@ const Register = () => {
             autoComplete="off"
             layout="vertical"
           >
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your email!",
-                },
-              ]}
-            >
-              <Input />
+            <Form.Item label="Email" name="_id" initialValue={_id} hidden>
+              <Input disabled />
             </Form.Item>
-
+            <div>メールに送信されたコードを入力してください。</div>
+            <Divider />
             <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your password!",
-                },
-              ]}
+              label="Code"
+              name="code"
+              rules={[{ required: true, message: "Please input your code!" }]}
             >
-              <Input.Password />
-            </Form.Item>
-
-            <Form.Item label="Name" name="name">
               <Input />
             </Form.Item>
 
@@ -100,4 +87,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Verify;
