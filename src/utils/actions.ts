@@ -10,6 +10,8 @@ export async function authenticate(email: string, password: string) {
       // callbackUrl: "/",
       redirect: false,
     })
+    console.log(res);
+    
     return res
   } catch (error) {
      // eslint-disable-next-line @typescript-eslint/no-explicit-any
